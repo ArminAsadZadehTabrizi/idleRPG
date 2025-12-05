@@ -3,7 +3,8 @@ import {
   Coins, 
   Zap, 
   Users, 
-  Swords
+  Swords,
+  TrendingUp
 } from 'lucide-react';
 
 // ============================================
@@ -241,9 +242,20 @@ export default function App() {
   const [clickEffects, setClickEffects] = useState([]);
   const [isShaking, setIsShaking] = useState(false);
   const [activeShop, setActiveShop] = useState('gang'); // 'gang' or 'equipment'
+  const [moneyPulse, setMoneyPulse] = useState(false);
   
   const effectIdRef = useRef(0);
   const targetRef = useRef(null);
+  const prevMoneyRef = useRef(0);
+
+  // Pulse animation when money increases
+  useEffect(() => {
+    if (money > prevMoneyRef.current) {
+      setMoneyPulse(true);
+      setTimeout(() => setMoneyPulse(false), 300);
+    }
+    prevMoneyRef.current = money;
+  }, [money]);
 
   // Calculate total click damage from equipment
   useEffect(() => {
@@ -291,6 +303,25 @@ export default function App() {
   const defeatTarget = useCallback(() => {
     const loot = Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.3));
     
+    // Show money drop effect
+    const rect = targetRef.current?.getBoundingClientRect();
+    if (rect) {
+      const x = rect.width / 2;
+      const y = rect.height / 2;
+      const id = effectIdRef.current++;
+      setClickEffects(prev => [...prev, { 
+        id, 
+        x, 
+        y, 
+        text: `+$${formatNumber(loot)}`, 
+        type: 'money'
+      }]);
+      
+      setTimeout(() => {
+        setClickEffects(prev => prev.filter(effect => effect.id !== id));
+      }, 1000);
+    }
+    
     setMoney(prev => prev + loot);
     setTotalEarned(prev => {
       const newTotal = prev + loot;
@@ -322,16 +353,23 @@ export default function App() {
     if (rect) {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const text = CLICK_TEXTS[Math.floor(Math.random() * CLICK_TEXTS.length)];
-      const colors = ['text-yellow-300', 'text-red-400', 'text-cyan-300', 'text-pink-400', 'text-green-400'];
-      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Random chance for critical hit
+      const isCritical = Math.random() < 0.15;
+      const damage = isCritical ? clickDamage * 2 : clickDamage;
       
       const id = effectIdRef.current++;
-      setClickEffects(prev => [...prev, { id, x, y, text, color }]);
+      setClickEffects(prev => [...prev, { 
+        id, 
+        x, 
+        y, 
+        text: `${damage}`, 
+        type: isCritical ? 'critical' : 'normal'
+      }]);
       
       setTimeout(() => {
         setClickEffects(prev => prev.filter(effect => effect.id !== id));
-      }, 500);
+      }, 800);
     }
   }, [clickDamage]);
 
@@ -363,64 +401,73 @@ export default function App() {
 
   const hpPercent = Math.max(0, (targetHp / targetMaxHp) * 100);
 
-  // Get unique henchmen for display
+  // Get unique henchmen for display (limit to top 6 most powerful)
   const ownedHenchmen = HENCHMEN.filter(h => (henchmenOwned[h.id] || 0) > 0)
     .map(h => ({
       ...h,
       count: henchmenOwned[h.id]
-    }));
+    }))
+    .slice(-6); // Show last 6 (most powerful)
+
+  // Zone names based on tier
+  const ZONE_NAMES = ["THE STREETS", "NEON CITY", "BANK DISTRICT", "FINAL LAIR"];
+  const currentZone = ZONE_NAMES[currentTier] || "THE STREETS";
+  
+  // Dynamic background based on tier
+  const tierBackgrounds = [
+    "linear-gradient(180deg, #1e3a5f 0%, #2c4a6b 50%, #1a2332 100%)", // Tier 0: Dark Blue/Grey
+    "linear-gradient(180deg, #4a1e6b 0%, #7c2d91 50%, #2d1042 100%)", // Tier 1: Deep Purple/Pink
+    "linear-gradient(180deg, #0f4a3e 0%, #1a6b5e 50%, #0a1a1a 100%)", // Tier 2: Emerald/Black
+    "linear-gradient(180deg, #5a0f0f 0%, #8b1515 50%, #1a0a0a 100%)", // Tier 3: Red/Darkness
+  ];
 
   return (
     <div className="game-container">
-      {/* BATTLE SCENE (Top 60%) */}
-      <div className="battle-scene">
-        {/* Floating Stats Overlay */}
-        <div className="floating-stats">
-          <div className="stat-badge money-badge">
-            <Coins className="stat-icon" />
-            <span className="stat-value">${formatNumber(money)}</span>
-          </div>
-          <div className="stat-badge dps-badge">
-            <Zap className="stat-icon" />
-            <span className="stat-value">{formatNumber(totalDps)} DPS</span>
-          </div>
+      {/* HUD - Fixed Top Bar with Glassmorphism */}
+      <div className="hud">
+        <div className={`hud-money ${moneyPulse ? 'pulse' : ''}`}>
+          <Coins className="hud-icon" />
+          <span className="hud-value">${formatNumber(money)}</span>
         </div>
+        <div className="hud-zone">
+          <div className="zone-badge">{currentZone}</div>
+        </div>
+        <div className="hud-dps">
+          <Zap className="hud-icon" />
+          <span className="hud-value">{formatNumber(totalDps)}</span>
+        </div>
+      </div>
 
-        {/* Stage Area */}
-        <div className="stage-area">
+      {/* BATTLE STAGE (Top 60%) */}
+      <div className="battle-stage" style={{ background: tierBackgrounds[currentTier] }}>
+        {/* Animated grid pattern overlay */}
+        <div className="stage-grid"></div>
+        
+        {/* Stage content */}
+        <div className="stage-content">
           {/* Target Info */}
           <div className="target-info">
             <h2 className="target-name">{currentTarget.name}</h2>
-            <div className="target-level">Level {targetLevel}</div>
+            <div className="target-level">LEVEL {targetLevel}</div>
           </div>
 
-          {/* HP Bar */}
-          <div className="hp-bar-container">
-            <div className="hp-bar-fill" style={{ width: `${hpPercent}%` }}>
-              <div className="hp-gradient"></div>
-            </div>
-            <div className="hp-text">
-              {formatNumber(Math.max(0, targetHp))} / {formatNumber(targetMaxHp)}
-            </div>
-          </div>
-
-          {/* Target Image */}
+          {/* Target Monster */}
           <div 
             ref={targetRef}
             onClick={handleClick}
-            className={`target-image ${isShaking ? 'shake' : ''}`}
+            className={`target-monster ${isShaking ? 'shake' : ''}`}
           >
             <img 
-              src={`https://robohash.org/${currentTarget.name}?set=set2&size=300x300`}
+              src={`https://robohash.org/${currentTarget.name}?set=set2&size=400x400`}
               alt={currentTarget.name}
               className="monster-img"
             />
             
-            {/* Click effects */}
+            {/* Floating damage/money effects */}
             {clickEffects.map(effect => (
               <div
                 key={effect.id}
-                className={`damage-text ${effect.color}`}
+                className={`floating-number ${effect.type}`}
                 style={{
                   left: effect.x,
                   top: effect.y,
@@ -431,124 +478,149 @@ export default function App() {
             ))}
           </div>
 
-          {/* The Ground with Henchmen */}
-          <div className="ground">
-            <div className="ground-line"></div>
-            <div className="henchmen-display">
-              {ownedHenchmen.length === 0 ? (
-                <div className="no-henchmen">
-                  <Users className="w-8 h-8 opacity-30" />
-                  <p className="text-sm opacity-50">No gang members yet</p>
-                </div>
-              ) : (
-                ownedHenchmen.map(henchman => (
-                  <div key={henchman.id} className="henchman-avatar">
-                    <img 
-                      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${henchman.name}`}
-                      alt={henchman.name}
-                      className="avatar-img"
-                    />
-                    <div className="avatar-count">x{henchman.count}</div>
-                  </div>
-                ))
-              )}
+          {/* HP Bar directly under monster */}
+          <div className="hp-bar-wrapper">
+            <div className="hp-bar-container">
+              <div className="hp-bar-fill" style={{ width: `${hpPercent}%` }}>
+                <div className="hp-shine"></div>
+              </div>
+              <div className="hp-text">
+                {formatNumber(Math.max(0, targetHp))} / {formatNumber(targetMaxHp)}
+              </div>
             </div>
+          </div>
+
+          {/* 3D Platform with Henchmen */}
+          <div className="platform-scene">
+            <div className="platform">
+              {/* Henchmen positioned around platform */}
+              <div className="henchmen-crew">
+                {ownedHenchmen.length === 0 ? (
+                  <div className="no-crew">
+                    <Users className="no-crew-icon" />
+                    <p className="no-crew-text">Recruit your crew below</p>
+                  </div>
+                ) : (
+                  ownedHenchmen.map((henchman, index) => (
+                    <div 
+                      key={henchman.id} 
+                      className={`crew-member position-${index % 6}`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <img 
+                        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${henchman.name}`}
+                        alt={henchman.name}
+                        className="crew-avatar"
+                      />
+                      <div className="crew-count">×{henchman.count}</div>
+                      <div className="crew-glow"></div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="platform-shadow"></div>
           </div>
         </div>
       </div>
 
       {/* SHOP PANEL (Bottom 40%) */}
       <div className="shop-panel">
-        {/* Shop Tabs */}
-        <div className="shop-tabs">
+        {/* Sticky Shop Tabs */}
+        <div className="shop-tabs-sticky">
           <button
             onClick={() => setActiveShop('gang')}
             className={`shop-tab ${activeShop === 'gang' ? 'active' : ''}`}
           >
             <Users className="tab-icon" />
-            <span>Gang</span>
+            <span className="tab-label">GANG</span>
           </button>
           <button
             onClick={() => setActiveShop('equipment')}
             className={`shop-tab ${activeShop === 'equipment' ? 'active' : ''}`}
           >
             <Swords className="tab-icon" />
-            <span>Equipment</span>
+            <span className="tab-label">EQUIPMENT</span>
           </button>
         </div>
 
-        {/* Shop Content */}
+        {/* Shop Content - Scrollable */}
         <div className="shop-content">
           {activeShop === 'gang' ? (
-            <div className="shop-grid">
+            <div className="shop-list">
               {HENCHMEN.map(henchman => {
                 const owned = henchmenOwned[henchman.id] || 0;
                 const cost = getItemCost(henchman.baseCost, owned);
                 const canAfford = money >= cost;
                 
                 return (
-                  <button
+                  <div
                     key={henchman.id}
-                    onClick={() => buyHenchman(henchman)}
-                    disabled={!canAfford}
-                    className={`shop-item ${!canAfford ? 'disabled' : ''}`}
+                    className={`shop-card ${!canAfford ? 'disabled' : ''}`}
                   >
-                    <div className="item-avatar">
+                    <div className="card-icon-wrapper">
                       <img 
                         src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${henchman.name}`}
                         alt={henchman.name}
+                        className="card-icon"
                       />
-                      {owned > 0 && <div className="owned-badge">x{owned}</div>}
+                      {owned > 0 && <div className="card-level">Lv.{owned}</div>}
                     </div>
-                    <div className="item-info">
-                      <div className="item-name">{henchman.name}</div>
-                      <div className="item-desc">{henchman.description}</div>
-                      <div className="item-stats">
-                        <div className="item-dps">
-                          <Zap className="w-3 h-3" />
-                          +{henchman.baseDps} DPS
-                        </div>
-                        <div className={`item-cost ${!canAfford ? 'cant-afford' : ''}`}>
-                          ${formatNumber(cost)}
-                        </div>
+                    <div className="card-details">
+                      <div className="card-name">{henchman.name}</div>
+                      <div className="card-desc">{henchman.description}</div>
+                      <div className="card-stat">
+                        <TrendingUp className="stat-icon-small" />
+                        <span>+{henchman.baseDps} DPS</span>
                       </div>
                     </div>
-                  </button>
+                    <button
+                      onClick={() => buyHenchman(henchman)}
+                      disabled={!canAfford}
+                      className={`buy-button ${canAfford ? 'affordable' : 'unaffordable'}`}
+                    >
+                      <Coins className="buy-icon" />
+                      <span className="buy-cost">{formatNumber(cost)}</span>
+                    </button>
+                  </div>
                 );
               })}
             </div>
           ) : (
-            <div className="shop-grid">
+            <div className="shop-list">
               {EQUIPMENT.map(equipment => {
                 const owned = equipmentOwned[equipment.id] || 0;
                 const cost = getItemCost(equipment.baseCost, owned);
                 const canAfford = money >= cost;
                 
                 return (
-                  <button
+                  <div
                     key={equipment.id}
-                    onClick={() => buyEquipment(equipment)}
-                    disabled={!canAfford}
-                    className={`shop-item ${!canAfford ? 'disabled' : ''}`}
+                    className={`shop-card ${!canAfford ? 'disabled' : ''}`}
                   >
-                    <div className="item-icon">
-                      <span className="icon-emoji">{equipment.icon}</span>
-                      {owned > 0 && <div className="owned-badge">x{owned}</div>}
+                    <div className="card-icon-wrapper equipment">
+                      <div className="equipment-icon">
+                        <span className="equipment-emoji">{equipment.icon}</span>
+                      </div>
+                      {owned > 0 && <div className="card-level">Lv.{owned}</div>}
                     </div>
-                    <div className="item-info">
-                      <div className="item-name">{equipment.name}</div>
-                      <div className="item-desc">{equipment.description}</div>
-                      <div className="item-stats">
-                        <div className="item-dps">
-                          <Swords className="w-3 h-3" />
-                          +{equipment.clickDamage} DMG
-                        </div>
-                        <div className={`item-cost ${!canAfford ? 'cant-afford' : ''}`}>
-                          ${formatNumber(cost)}
-                        </div>
+                    <div className="card-details">
+                      <div className="card-name">{equipment.name}</div>
+                      <div className="card-desc">{equipment.description}</div>
+                      <div className="card-stat">
+                        <Swords className="stat-icon-small" />
+                        <span>+{equipment.clickDamage} DMG</span>
                       </div>
                     </div>
-                  </button>
+                    <button
+                      onClick={() => buyEquipment(equipment)}
+                      disabled={!canAfford}
+                      className={`buy-button ${canAfford ? 'affordable' : 'unaffordable'}`}
+                    >
+                      <Coins className="buy-icon" />
+                      <span className="buy-cost">{formatNumber(cost)}</span>
+                    </button>
+                  </div>
                 );
               })}
             </div>
