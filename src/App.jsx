@@ -5,123 +5,175 @@ import {
   Zap, 
   ShoppingBag, 
   Users, 
-  Trophy,
   Target,
   TrendingUp,
-  Clock,
   Crosshair,
   Shield,
-  Swords
+  Swords,
+  Hammer,
+  Wrench
 } from 'lucide-react';
 
 // ============================================
 // GAME DATA
 // ============================================
 
-const TARGETS = [
-  { name: "Verwirrter Tourist", emoji: "🧳", baseHp: 25, baseLoot: 8, color: "bg-green-400" },
-  { name: "Parkuhr", emoji: "🅿️", baseHp: 60, baseLoot: 20, color: "bg-blue-400" },
-  { name: "Kleiner Kiosk", emoji: "🏪", baseHp: 120, baseLoot: 45, color: "bg-cyan-400" },
-  { name: "Geldautomat", emoji: "🏧", baseHp: 250, baseLoot: 100, color: "bg-yellow-400" },
-  { name: "Juwelier", emoji: "💎", baseHp: 500, baseLoot: 220, color: "bg-pink-400" },
-  { name: "Tresorraum", emoji: "🔐", baseHp: 1000, baseLoot: 500, color: "bg-orange-400" },
-  { name: "Stadtbank", emoji: "🏦", baseHp: 2000, baseLoot: 1100, color: "bg-purple-400" },
-  { name: "Casino Royale", emoji: "🎰", baseHp: 4000, baseLoot: 2500, color: "bg-red-400" },
-  { name: "Börse", emoji: "📈", baseHp: 8000, baseLoot: 5500, color: "bg-emerald-400" },
-  { name: "Zentralbank", emoji: "🏛️", baseHp: 16000, baseLoot: 12000, color: "bg-violet-400" },
-  { name: "Weltbank", emoji: "🌍", baseHp: 35000, baseLoot: 28000, color: "bg-amber-400" },
-  { name: "Fort Knox", emoji: "🏰", baseHp: 75000, baseLoot: 65000, color: "bg-rose-400" },
+// TIER SYSTEM: 4 Tiers with rarity-based spawn rates
+const TIER_1_TARGETS = [
+  { name: "Street Musician", emoji: "🎸", baseHp: 20, baseLoot: 5, rarity: "common", color: "bg-green-400" },
+  { name: "Pensioner", emoji: "👴", baseHp: 35, baseLoot: 12, rarity: "medium", color: "bg-blue-400" },
+  { name: "Confused Tourist", emoji: "🧳", baseHp: 50, baseLoot: 25, rarity: "rare", color: "bg-yellow-400" },
 ];
 
-const RANKS = [
-  { name: "Kleiner Taschendieb", emoji: "🐀", threshold: 0, color: "text-gray-300" },
-  { name: "Straßenräuber", emoji: "🔪", threshold: 100, color: "text-green-400" },
-  { name: "Einbrecher", emoji: "🗝️", threshold: 500, color: "text-blue-400" },
-  { name: "Gauner", emoji: "🎭", threshold: 2000, color: "text-cyan-400" },
-  { name: "Gangster", emoji: "🔫", threshold: 8000, color: "text-yellow-400" },
-  { name: "Unterweltboss", emoji: "👔", threshold: 30000, color: "text-orange-400" },
-  { name: "Verbrechergenie", emoji: "🧠", threshold: 100000, color: "text-pink-400" },
-  { name: "Mastermind", emoji: "🎩", threshold: 350000, color: "text-purple-400" },
-  { name: "Superschurke", emoji: "💀", threshold: 1000000, color: "text-red-400" },
-  { name: "Weltherrscher", emoji: "👑", threshold: 5000000, color: "text-amber-400" },
+const TIER_2_TARGETS = [
+  { name: "Delivery Van", emoji: "🚐", baseHp: 80, baseLoot: 40, rarity: "common", color: "bg-cyan-400" },
+  { name: "Gas Station", emoji: "⛽", baseHp: 150, baseLoot: 85, rarity: "medium", color: "bg-orange-400" },
+  { name: "Safe", emoji: "🔐", baseHp: 200, baseLoot: 130, rarity: "medium", color: "bg-amber-500" },
+  { name: "Gumball Machine", emoji: "🍬", baseHp: 250, baseLoot: 200, rarity: "rare", color: "bg-pink-400" },
 ];
 
+const TIER_3_TARGETS = [
+  { name: "ATM", emoji: "🏧", baseHp: 400, baseLoot: 300, rarity: "common", color: "bg-emerald-400" },
+  { name: "Bank", emoji: "🏦", baseHp: 800, baseLoot: 700, rarity: "rare", color: "bg-purple-500" },
+  { name: "Jeweler", emoji: "💎", baseHp: 1200, baseLoot: 1100, rarity: "rare", color: "bg-pink-500" },
+  { name: "Robot", emoji: "🤖", baseHp: 1500, baseLoot: 1400, rarity: "rare", color: "bg-cyan-500" },
+];
+
+const TIER_4_TARGETS = [
+  { name: "The White House", emoji: "🏛️", baseHp: 3000, baseLoot: 2500, rarity: "common", color: "bg-blue-500" },
+  { name: "Mega Robot", emoji: "🦾", baseHp: 6000, baseLoot: 5000, rarity: "medium", color: "bg-slate-500" },
+  { name: "Superhero", emoji: "🦸", baseHp: 10000, baseLoot: 9000, rarity: "rare", color: "bg-red-500" },
+  { name: "Dragon", emoji: "🐉", baseHp: 20000, baseLoot: 18000, rarity: "ultra_rare", color: "bg-violet-600" },
+];
+
+const ALL_TIERS = [TIER_1_TARGETS, TIER_2_TARGETS, TIER_3_TARGETS, TIER_4_TARGETS];
+
+// EQUIPMENT (Click Damage)
+const EQUIPMENT = [
+  { 
+    id: 'brass_knuckles', 
+    name: "Brass Knuckles", 
+    emoji: "✊", 
+    clickDamage: 1, 
+    baseCost: 50, 
+    description: "Basic street fight",
+    color: "bg-amber-600"
+  },
+  { 
+    id: 'crowbar', 
+    name: "Crowbar", 
+    emoji: "🪛", 
+    clickDamage: 5, 
+    baseCost: 250, 
+    description: "Break and enter",
+    color: "bg-gray-600"
+  },
+  { 
+    id: 'baseball_bat', 
+    name: "Baseball Bat", 
+    emoji: "⚾", 
+    clickDamage: 12, 
+    baseCost: 1000, 
+    description: "Swing for the fences",
+    color: "bg-brown-600"
+  },
+  { 
+    id: 'pistol', 
+    name: "Pistol", 
+    emoji: "🔫", 
+    clickDamage: 40, 
+    baseCost: 5000, 
+    description: "Pack some heat",
+    color: "bg-slate-700"
+  },
+  { 
+    id: 'assault_rifle', 
+    name: "Assault Rifle", 
+    emoji: "🔫", 
+    clickDamage: 150, 
+    baseCost: 25000, 
+    description: "Heavy firepower",
+    color: "bg-red-700"
+  },
+];
+
+// HENCHMEN (Auto-DPS) - Villain themed
 const HENCHMEN = [
   { 
-    id: 'lookout', 
-    name: "Schmiere-Steher", 
-    emoji: "👀", 
+    id: 'street_rat', 
+    name: "Street Rat", 
+    emoji: "🐀", 
     baseDps: 1, 
     baseCost: 25, 
-    description: "Hält Ausschau",
-    color: "bg-green-500"
+    description: "Sneaky petty thief",
+    color: "bg-gray-500"
   },
   { 
     id: 'thug', 
-    name: "Schläger", 
+    name: "Thug", 
     emoji: "👊", 
     baseDps: 4, 
     baseCost: 100, 
-    description: "Macht Druck",
+    description: "Muscle for hire",
     color: "bg-orange-500"
   },
   { 
-    id: 'hacker', 
-    name: "Hacker", 
-    emoji: "💻", 
+    id: 'burglar', 
+    name: "Pro Burglar", 
+    emoji: "🥷", 
     baseDps: 12, 
     baseCost: 400, 
-    description: "Knackt Systeme",
+    description: "Silent and deadly",
+    color: "bg-indigo-500"
+  },
+  { 
+    id: 'hacker', 
+    name: "Elite Hacker", 
+    emoji: "💻", 
+    baseDps: 35, 
+    baseCost: 1500, 
+    description: "Cracks any system",
     color: "bg-cyan-500"
   },
   { 
-    id: 'safecracker', 
-    name: "Tresorknacker", 
-    emoji: "🔓", 
-    baseDps: 35, 
-    baseCost: 1500, 
-    description: "Öffnet alles",
-    color: "bg-yellow-500"
-  },
-  { 
-    id: 'cop', 
-    name: "Korrupter Cop", 
-    emoji: "🚔", 
+    id: 'lawyer', 
+    name: "Corrupt Lawyer", 
+    emoji: "⚖️", 
     baseDps: 100, 
     baseCost: 5000, 
-    description: "Schaut weg",
-    color: "bg-blue-500"
+    description: "Gets you off the hook",
+    color: "bg-blue-600"
   },
   { 
-    id: 'assassin', 
-    name: "Profi-Killer", 
-    emoji: "🎯", 
+    id: 'enforcer', 
+    name: "Enforcer", 
+    emoji: "🔨", 
     baseDps: 300, 
     baseCost: 18000, 
-    description: "Erledigt Probleme",
-    color: "bg-red-500"
+    description: "Collects debts",
+    color: "bg-red-600"
   },
   { 
     id: 'scientist', 
-    name: "Verrückter Wissenschaftler", 
+    name: "Mad Scientist", 
     emoji: "🧪", 
     baseDps: 1000, 
     baseCost: 75000, 
-    description: "Erfindet Waffen",
-    color: "bg-purple-500"
+    description: "Invents evil gadgets",
+    color: "bg-purple-600"
   },
   { 
     id: 'army', 
-    name: "Privatarmee", 
+    name: "Private Army", 
     emoji: "🪖", 
     baseDps: 4000, 
     baseCost: 350000, 
-    description: "Übernimmt Städte",
-    color: "bg-emerald-500"
+    description: "Military might",
+    color: "bg-emerald-600"
   },
 ];
 
-const CLICK_TEXTS = ["BAM!", "ZACK!", "POW!", "WHAM!", "KRACH!", "BUMM!", "PENG!", "KLATSCH!"];
+const CLICK_TEXTS = ["POW!", "BAM!", "WHAM!", "KAPOW!", "CRASH!", "BOOM!", "BANG!", "SMASH!"];
 
 // ============================================
 // HELPER FUNCTIONS
@@ -133,27 +185,63 @@ const formatNumber = (num) => {
   return Math.floor(num).toString();
 };
 
-const getHenchmanCost = (baseCost, owned) => {
+const getItemCost = (baseCost, owned) => {
   return Math.floor(baseCost * Math.pow(1.15, owned));
 };
 
-const getCurrentRank = (totalEarned) => {
-  let currentRank = RANKS[0];
-  for (const rank of RANKS) {
-    if (totalEarned >= rank.threshold) {
-      currentRank = rank;
-    }
-  }
-  return currentRank;
-};
+// SPAWN LOGIC: Pick target from current tier with leakage mechanic
+const spawnTarget = (currentTier, totalEarned) => {
+  // Determine tier based on total earned
+  let tierIndex = 0;
+  if (totalEarned >= 200000) tierIndex = 3; // Tier 4
+  else if (totalEarned >= 10000) tierIndex = 2; // Tier 3
+  else if (totalEarned >= 500) tierIndex = 1; // Tier 2
+  else tierIndex = 0; // Tier 1
 
-const getNextRank = (totalEarned) => {
-  for (const rank of RANKS) {
-    if (totalEarned < rank.threshold) {
-      return rank;
+  // Leakage mechanic: 25% chance to spawn from lower tier (if not in tier 1)
+  if (tierIndex > 0 && Math.random() < 0.25) {
+    tierIndex = Math.floor(Math.random() * tierIndex);
+  }
+
+  const tier = ALL_TIERS[tierIndex];
+  
+  // Rarity-based spawn rate
+  // Ultra rare: 5%, Rare: 15%, Medium: 30%, Common: 50%
+  const rand = Math.random();
+  
+  // Filter by rarity
+  let chosenTarget;
+  if (rand < 0.05) {
+    // Ultra rare (5%)
+    const ultraRare = tier.filter(t => t.rarity === 'ultra_rare');
+    if (ultraRare.length > 0) {
+      chosenTarget = ultraRare[Math.floor(Math.random() * ultraRare.length)];
     }
   }
-  return null;
+  
+  if (!chosenTarget && rand < 0.20) {
+    // Rare (15% more = 20% cumulative)
+    const rare = tier.filter(t => t.rarity === 'rare');
+    if (rare.length > 0) {
+      chosenTarget = rare[Math.floor(Math.random() * rare.length)];
+    }
+  }
+  
+  if (!chosenTarget && rand < 0.50) {
+    // Medium (30% more = 50% cumulative)
+    const medium = tier.filter(t => t.rarity === 'medium');
+    if (medium.length > 0) {
+      chosenTarget = medium[Math.floor(Math.random() * medium.length)];
+    }
+  }
+  
+  if (!chosenTarget) {
+    // Common (remaining 50%)
+    const common = tier.filter(t => t.rarity === 'common');
+    chosenTarget = common[Math.floor(Math.random() * common.length)];
+  }
+
+  return { target: chosenTarget, tierIndex };
 };
 
 // ============================================
@@ -165,19 +253,34 @@ export default function App() {
   const [money, setMoney] = useState(0);
   const [totalEarned, setTotalEarned] = useState(0);
   const [clickDamage, setClickDamage] = useState(1);
-  const [targetIndex, setTargetIndex] = useState(0);
-  const [targetHp, setTargetHp] = useState(TARGETS[0].baseHp);
-  const [targetMaxHp, setTargetMaxHp] = useState(TARGETS[0].baseHp);
+  const [currentTarget, setCurrentTarget] = useState(TIER_1_TARGETS[0]);
+  const [currentTier, setCurrentTier] = useState(0);
+  const [targetHp, setTargetHp] = useState(TIER_1_TARGETS[0].baseHp);
+  const [targetMaxHp, setTargetMaxHp] = useState(TIER_1_TARGETS[0].baseHp);
   const [targetLevel, setTargetLevel] = useState(1);
   const [henchmenOwned, setHenchmenOwned] = useState({});
+  const [equipmentOwned, setEquipmentOwned] = useState({});
   const [totalDps, setTotalDps] = useState(0);
   const [clickEffects, setClickEffects] = useState([]);
   const [isShaking, setIsShaking] = useState(false);
   const [totalClicks, setTotalClicks] = useState(0);
   const [targetsDefeated, setTargetsDefeated] = useState(0);
+  const [activeShop, setActiveShop] = useState('henchmen'); // 'henchmen' or 'equipment'
   
   const effectIdRef = useRef(0);
   const targetRef = useRef(null);
+
+  // Calculate total click damage from equipment
+  useEffect(() => {
+    let damage = 1; // Base click damage
+    for (const equipment of EQUIPMENT) {
+      const owned = equipmentOwned[equipment.id] || 0;
+      if (owned > 0) {
+        damage += equipment.clickDamage * owned;
+      }
+    }
+    setClickDamage(damage);
+  }, [equipmentOwned]);
 
   // Calculate DPS from henchmen
   useEffect(() => {
@@ -211,32 +314,26 @@ export default function App() {
   }, [targetHp]);
 
   const defeatTarget = useCallback(() => {
-    const currentTarget = TARGETS[targetIndex];
     const loot = Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.5));
     
     setMoney(prev => prev + loot);
     setTotalEarned(prev => prev + loot);
     setTargetsDefeated(prev => prev + 1);
     
-    // Spawn next target
-    let nextIndex = targetIndex;
-    let nextLevel = targetLevel + 1;
-    
-    // Progress to next target type every 10 levels
-    if (targetLevel % 10 === 0 && targetIndex < TARGETS.length - 1) {
-      nextIndex = targetIndex + 1;
-      setTargetIndex(nextIndex);
-    }
-    
+    // Spawn next target using tier system
+    const nextLevel = targetLevel + 1;
     setTargetLevel(nextLevel);
     
-    const nextTarget = TARGETS[nextIndex];
+    const { target, tierIndex } = spawnTarget(currentTier, totalEarned + loot);
+    setCurrentTarget(target);
+    setCurrentTier(tierIndex);
+    
     const levelMultiplier = 1 + (nextLevel - 1) * 0.3;
-    const newMaxHp = Math.floor(nextTarget.baseHp * levelMultiplier);
+    const newMaxHp = Math.floor(target.baseHp * levelMultiplier);
     
     setTargetMaxHp(newMaxHp);
     setTargetHp(newMaxHp);
-  }, [targetIndex, targetLevel]);
+  }, [currentTarget, currentTier, targetLevel, totalEarned]);
 
   const handleClick = useCallback((e) => {
     // Deal damage
@@ -267,7 +364,7 @@ export default function App() {
 
   const buyHenchman = useCallback((henchman) => {
     const owned = henchmenOwned[henchman.id] || 0;
-    const cost = getHenchmanCost(henchman.baseCost, owned);
+    const cost = getItemCost(henchman.baseCost, owned);
     
     if (money >= cost) {
       setMoney(prev => prev - cost);
@@ -278,10 +375,21 @@ export default function App() {
     }
   }, [money, henchmenOwned]);
 
-  const currentTarget = TARGETS[targetIndex];
-  const currentRank = getCurrentRank(totalEarned);
-  const nextRank = getNextRank(totalEarned);
+  const buyEquipment = useCallback((equipment) => {
+    const owned = equipmentOwned[equipment.id] || 0;
+    const cost = getItemCost(equipment.baseCost, owned);
+    
+    if (money >= cost) {
+      setMoney(prev => prev - cost);
+      setEquipmentOwned(prev => ({
+        ...prev,
+        [equipment.id]: (prev[equipment.id] || 0) + 1
+      }));
+    }
+  }, [money, equipmentOwned]);
+
   const hpPercent = Math.max(0, (targetHp / targetMaxHp) * 100);
+  const tierNames = ["The Streets", "Small Crimes", "Organized Crime", "Unstoppable"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-2 sm:p-4 overflow-hidden">
@@ -313,7 +421,7 @@ export default function App() {
                     RISE OF THE VILLAIN
                   </h1>
                   <p className="text-xs sm:text-sm text-purple-200 font-bold">
-                    Werde zum Superschurken!
+                    Become the Ultimate Supervillain!
                   </p>
                 </div>
               </div>
@@ -324,7 +432,7 @@ export default function App() {
                 <div className="neo-brutal-sm bg-yellow-400 px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2">
                   <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-800" />
                   <span className="text-lg sm:text-xl font-black text-black">
-                    {formatNumber(money)} €
+                    ${formatNumber(money)}
                   </span>
                 </div>
 
@@ -338,22 +446,20 @@ export default function App() {
               </div>
             </div>
 
-            {/* Rank Display */}
+            {/* Tier Display (replaces Rank) */}
             <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-300" />
-                <span className="text-white font-bold">Rang:</span>
-                <span className={`comic-font text-xl sm:text-2xl ${currentRank.color}`}>
-                  {currentRank.emoji} {currentRank.name}
+                <Target className="w-5 h-5 text-yellow-300" />
+                <span className="text-white font-bold">Current Tier:</span>
+                <span className="comic-font text-xl sm:text-2xl text-cyan-300">
+                  {tierNames[currentTier]}
                 </span>
               </div>
               
-              {nextRank && (
-                <div className="text-purple-200 text-xs sm:text-sm">
-                  <span className="opacity-75">Nächster Rang bei:</span>{' '}
-                  <span className="font-black text-yellow-300">{formatNumber(nextRank.threshold)} €</span>
-                </div>
-              )}
+              <div className="text-purple-200 text-xs sm:text-sm">
+                <span className="opacity-75">Total Earned:</span>{' '}
+                <span className="font-black text-yellow-300">${formatNumber(totalEarned)}</span>
+              </div>
             </div>
           </div>
         </header>
@@ -364,28 +470,28 @@ export default function App() {
           <div className="lg:w-64 order-2 lg:order-1">
             <div className="neo-brutal bg-slate-800 p-4 rounded-xl">
               <h2 className="comic-font text-xl text-cyan-400 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" /> STATISTIK
+                <TrendingUp className="w-5 h-5" /> STATS
               </h2>
               
               <div className="space-y-3 text-white">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Klicks:</span>
+                  <span className="text-gray-400">Clicks:</span>
                   <span className="font-black text-yellow-400">{formatNumber(totalClicks)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Ziele erledigt:</span>
+                  <span className="text-gray-400">Targets Defeated:</span>
                   <span className="font-black text-red-400">{targetsDefeated}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Klick-Schaden:</span>
+                  <span className="text-gray-400">Click Damage:</span>
                   <span className="font-black text-cyan-400">{clickDamage}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Gesamt verdient:</span>
-                  <span className="font-black text-green-400">{formatNumber(totalEarned)} €</span>
+                  <span className="text-gray-400">Total Earned:</span>
+                  <span className="font-black text-green-400">${formatNumber(totalEarned)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Ziel-Level:</span>
+                  <span className="text-gray-400">Target Level:</span>
                   <span className="font-black text-purple-400">{targetLevel}</span>
                 </div>
               </div>
@@ -393,7 +499,7 @@ export default function App() {
               {/* Henchmen Summary */}
               <div className="mt-4 pt-4 border-t-2 border-slate-700">
                 <h3 className="text-sm text-gray-400 mb-2 flex items-center gap-1">
-                  <Users className="w-4 h-4" /> Komplizen im Team:
+                  <Users className="w-4 h-4" /> Your Gang:
                 </h3>
                 <div className="flex flex-wrap gap-1">
                   {HENCHMEN.map(h => {
@@ -407,25 +513,32 @@ export default function App() {
                     );
                   })}
                   {Object.values(henchmenOwned).every(v => !v) && (
-                    <span className="text-gray-500 text-sm">Noch keine...</span>
+                    <span className="text-gray-500 text-sm">None yet...</span>
                   )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* CENTER - Target */}
+          {/* CENTER - Target (Character Card Style) */}
           <div className="flex-1 order-1 lg:order-2">
             <div className="neo-brutal-lg bg-gradient-to-b from-slate-800 to-slate-900 p-4 sm:p-6 rounded-xl min-h-[400px] sm:min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
               {/* Target Info */}
               <div className="text-center mb-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Target className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-400 font-bold text-sm">ZIEL LEVEL {targetLevel}</span>
+                  <span className="text-gray-400 font-bold text-sm">LEVEL {targetLevel}</span>
+                  <span className="text-gray-500 text-xs">• {tierNames[currentTier]}</span>
                 </div>
                 <h2 className="comic-font text-2xl sm:text-3xl text-white">
-                  {currentTarget.emoji} {currentTarget.name}
+                  {currentTarget.name}
                 </h2>
+                <div className="text-xs text-gray-400 mt-1 uppercase tracking-wider">
+                  {currentTarget.rarity === 'ultra_rare' && '★★★★ ULTRA RARE ★★★★'}
+                  {currentTarget.rarity === 'rare' && '★★★ RARE ★★★'}
+                  {currentTarget.rarity === 'medium' && '★★ MEDIUM'}
+                  {currentTarget.rarity === 'common' && '★ COMMON'}
+                </div>
               </div>
 
               {/* HP Bar */}
@@ -448,32 +561,45 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Clickable Target */}
+              {/* Character Card (replaces circular button) */}
               <button 
                 ref={targetRef}
                 onClick={handleClick}
-                aria-label={`Angriff auf ${currentTarget.name}`}
+                aria-label={`Attack ${currentTarget.name}`}
                 className={`
                   relative cursor-pointer select-none
-                  neo-brutal-lg ${currentTarget.color}
-                  w-40 h-40 sm:w-52 sm:h-52 rounded-full
-                  flex items-center justify-center
+                  character-card neo-brutal-lg
+                  w-64 h-80 sm:w-72 sm:h-96 rounded-2xl
+                  flex flex-col items-center justify-center
                   transition-transform hover:scale-105 active:scale-95
                   ${isShaking ? 'shake' : ''}
                   pulse-glow
+                  p-6
                 `}
               >
-                {/* Inner glow */}
-                <div className="absolute inset-4 rounded-full bg-white/20" />
+                {/* Card Border Accent */}
+                <div className="absolute inset-3 border-4 border-yellow-500/30 rounded-xl pointer-events-none" />
                 
                 {/* Target emoji */}
-                <span className="text-6xl sm:text-8xl relative z-10 drop-shadow-lg">
-                  {currentTarget.emoji}
-                </span>
+                <div className="mb-4">
+                  <span className="text-8xl sm:text-9xl relative z-10 drop-shadow-2xl">
+                    {currentTarget.emoji}
+                  </span>
+                </div>
 
-                {/* Crosshair overlay */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
-                  <Crosshair className="w-full h-full text-black" />
+                {/* Target Name on Card */}
+                <div className="bg-black/70 px-4 py-2 rounded-lg neo-brutal-sm border-yellow-500">
+                  <h3 className="comic-font text-xl sm:text-2xl text-white text-center">
+                    {currentTarget.name}
+                  </h3>
+                </div>
+
+                {/* Stats overlay */}
+                <div className="absolute top-4 left-4 neo-brutal-sm bg-red-600 px-2 py-1 rounded">
+                  <span className="text-white text-xs font-black">LVL {targetLevel}</span>
+                </div>
+                <div className="absolute top-4 right-4 neo-brutal-sm bg-yellow-500 px-2 py-1 rounded">
+                  <span className="text-black text-xs font-black">${formatNumber(currentTarget.baseLoot)}</span>
                 </div>
 
                 {/* Click effects */}
@@ -500,19 +626,19 @@ export default function App() {
               <div className="mt-6 text-center">
                 <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
                   <Swords className="w-4 h-4" />
-                  Klicke zum Angreifen!
+                  Click to Attack!
                   <Swords className="w-4 h-4" />
                 </p>
                 <p className="text-yellow-400 font-black mt-1">
-                  +{clickDamage} Schaden pro Klick
+                  +{clickDamage} Damage per Click
                 </p>
               </div>
 
               {/* Loot Preview */}
               <div className="absolute bottom-4 right-4 neo-brutal-sm bg-yellow-400 px-3 py-2 rounded-lg">
-                <span className="text-xs text-yellow-800 font-bold">BEUTE:</span>
+                <span className="text-xs text-yellow-800 font-bold">LOOT:</span>
                 <span className="ml-2 font-black text-black">
-                  ~{formatNumber(Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.5)))} €
+                  ~${formatNumber(Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.5)))}
                 </span>
               </div>
             </div>
@@ -521,14 +647,46 @@ export default function App() {
           {/* RIGHT SIDE - Shop */}
           <div className="lg:w-80 order-3">
             <div className="neo-brutal bg-slate-800 p-4 rounded-xl">
+              {/* Shop Tabs */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setActiveShop('henchmen')}
+                  className={`
+                    flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-all
+                    ${activeShop === 'henchmen' 
+                      ? 'neo-brutal-sm bg-purple-600 text-white' 
+                      : 'bg-slate-700 text-gray-400 hover:bg-slate-600'
+                    }
+                  `}
+                >
+                  <Users className="w-4 h-4 inline mr-1" />
+                  HENCHMEN
+                </button>
+                <button
+                  onClick={() => setActiveShop('equipment')}
+                  className={`
+                    flex-1 py-2 px-3 rounded-lg font-bold text-sm transition-all
+                    ${activeShop === 'equipment' 
+                      ? 'neo-brutal-sm bg-orange-600 text-white' 
+                      : 'bg-slate-700 text-gray-400 hover:bg-slate-600'
+                    }
+                  `}
+                >
+                  <Hammer className="w-4 h-4 inline mr-1" />
+                  EQUIPMENT
+                </button>
+              </div>
+
               <h2 className="comic-font text-xl sm:text-2xl text-yellow-400 mb-4 flex items-center gap-2">
-                <ShoppingBag className="w-6 h-6" /> KOMPLIZEN
+                <ShoppingBag className="w-6 h-6" /> 
+                {activeShop === 'henchmen' ? 'HIRE GANG' : 'BUY GEAR'}
               </h2>
               
               <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                {HENCHMEN.map(henchman => {
+                {/* Henchmen Shop */}
+                {activeShop === 'henchmen' && HENCHMEN.map(henchman => {
                   const owned = henchmenOwned[henchman.id] || 0;
-                  const cost = getHenchmanCost(henchman.baseCost, owned);
+                  const cost = getItemCost(henchman.baseCost, owned);
                   const canAfford = money >= cost;
                   
                   return (
@@ -569,7 +727,60 @@ export default function App() {
                               <span className="text-white font-bold">+{henchman.baseDps} DPS</span>
                             </span>
                             <span className={`font-black text-sm ${canAfford ? 'text-white' : 'text-red-300'}`}>
-                              {formatNumber(cost)} €
+                              ${formatNumber(cost)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {/* Equipment Shop */}
+                {activeShop === 'equipment' && EQUIPMENT.map(equipment => {
+                  const owned = equipmentOwned[equipment.id] || 0;
+                  const cost = getItemCost(equipment.baseCost, owned);
+                  const canAfford = money >= cost;
+                  
+                  return (
+                    <button
+                      key={equipment.id}
+                      onClick={() => buyEquipment(equipment)}
+                      disabled={!canAfford}
+                      className={`
+                        w-full neo-brutal-sm rounded-lg p-3 text-left
+                        transition-all duration-150
+                        ${canAfford 
+                          ? `${equipment.color} hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]` 
+                          : 'bg-gray-700 opacity-60 cursor-not-allowed'
+                        }
+                      `}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Emoji */}
+                        <div className="text-3xl">{equipment.emoji}</div>
+                        
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="font-black text-white text-sm truncate">
+                              {equipment.name}
+                            </span>
+                            {owned > 0 && (
+                              <span className="neo-brutal-sm bg-black/30 px-2 py-0.5 rounded text-xs text-white font-black">
+                                x{owned}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-white/70 truncate">{equipment.description}</p>
+                          
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-xs flex items-center gap-1">
+                              <Wrench className="w-3 h-3 text-cyan-300" />
+                              <span className="text-white font-bold">+{equipment.clickDamage} Click</span>
+                            </span>
+                            <span className={`font-black text-sm ${canAfford ? 'text-white' : 'text-red-300'}`}>
+                              ${formatNumber(cost)}
                             </span>
                           </div>
                         </div>
@@ -579,14 +790,23 @@ export default function App() {
                 })}
               </div>
 
-              {/* Total DPS from henchmen */}
+              {/* Shop Summary */}
               <div className="mt-4 pt-4 border-t-2 border-slate-700">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Auto-Schaden:</span>
-                  <span className="comic-font text-xl text-red-400">
-                    {formatNumber(totalDps)} DPS
-                  </span>
-                </div>
+                {activeShop === 'henchmen' ? (
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400 text-sm">Auto Damage:</span>
+                    <span className="comic-font text-xl text-red-400">
+                      {formatNumber(totalDps)} DPS
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400 text-sm">Click Damage:</span>
+                    <span className="comic-font text-xl text-cyan-400">
+                      {clickDamage}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -595,7 +815,7 @@ export default function App() {
         {/* FOOTER */}
         <footer className="mt-6 text-center">
           <p className="text-gray-600 text-xs">
-            🦹 Rise of the Villain - Ein Idle RPG Clicker 🦹
+            🦹 Rise of the Villain - An Idle RPG Clicker 🦹
           </p>
         </footer>
       </div>

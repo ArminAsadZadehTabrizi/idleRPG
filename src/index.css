@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@600;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Poppins:wght@600;800;900&display=swap');
 @import "tailwindcss";
 
 * {
@@ -16,8 +16,8 @@ body {
 }
 
 .comic-font {
-  font-family: 'Bangers', cursive;
-  letter-spacing: 2px;
+  font-family: 'Carter One', cursive;
+  letter-spacing: 1px;
 }
 
 .neo-brutal {
@@ -91,4 +91,43 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #d97706;
+}
+
+/* Character Card styles */
+.character-card {
+  background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.character-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #fbbf24 0px,
+    #fbbf24 10px,
+    #000 10px,
+    #000 20px
+  );
+}
+
+.character-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #fbbf24 0px,
+    #fbbf24 10px,
+    #000 10px,
+    #000 20px
+  );
 }
