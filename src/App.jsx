@@ -19,43 +19,45 @@ import {
 // ============================================
 
 // TIER SYSTEM: 4 Tiers with rarity-based spawn rates
+// REBALANCED: Much easier early game for faster progression
 const TIER_1_TARGETS = [
-  { name: "Street Musician", emoji: "🎸", baseHp: 20, baseLoot: 5, rarity: "common", color: "bg-green-400" },
-  { name: "Pensioner", emoji: "👴", baseHp: 35, baseLoot: 12, rarity: "medium", color: "bg-blue-400" },
-  { name: "Confused Tourist", emoji: "🧳", baseHp: 50, baseLoot: 25, rarity: "rare", color: "bg-yellow-400" },
+  { name: "Street Musician", emoji: "🎸", baseHp: 10, baseLoot: 8, rarity: "common", color: "bg-green-400" },
+  { name: "Pensioner", emoji: "👴", baseHp: 15, baseLoot: 15, rarity: "medium", color: "bg-blue-400" },
+  { name: "Confused Tourist", emoji: "🧳", baseHp: 20, baseLoot: 30, rarity: "rare", color: "bg-yellow-400" },
 ];
 
 const TIER_2_TARGETS = [
-  { name: "Delivery Van", emoji: "🚐", baseHp: 80, baseLoot: 40, rarity: "common", color: "bg-cyan-400" },
-  { name: "Gas Station", emoji: "⛽", baseHp: 150, baseLoot: 85, rarity: "medium", color: "bg-orange-400" },
-  { name: "Safe", emoji: "🔐", baseHp: 200, baseLoot: 130, rarity: "medium", color: "bg-amber-500" },
-  { name: "Gumball Machine", emoji: "🍬", baseHp: 250, baseLoot: 200, rarity: "rare", color: "bg-pink-400" },
+  { name: "Delivery Van", emoji: "🚐", baseHp: 50, baseLoot: 60, rarity: "common", color: "bg-cyan-400" },
+  { name: "Gas Station", emoji: "⛽", baseHp: 100, baseLoot: 120, rarity: "medium", color: "bg-orange-400" },
+  { name: "Safe", emoji: "🔐", baseHp: 150, baseLoot: 200, rarity: "medium", color: "bg-amber-500" },
+  { name: "Gumball Machine", emoji: "🍬", baseHp: 200, baseLoot: 300, rarity: "rare", color: "bg-pink-400" },
 ];
 
 const TIER_3_TARGETS = [
-  { name: "ATM", emoji: "🏧", baseHp: 400, baseLoot: 300, rarity: "common", color: "bg-emerald-400" },
-  { name: "Bank", emoji: "🏦", baseHp: 800, baseLoot: 700, rarity: "rare", color: "bg-purple-500" },
-  { name: "Jeweler", emoji: "💎", baseHp: 1200, baseLoot: 1100, rarity: "rare", color: "bg-pink-500" },
-  { name: "Robot", emoji: "🤖", baseHp: 1500, baseLoot: 1400, rarity: "rare", color: "bg-cyan-500" },
+  { name: "ATM", emoji: "🏧", baseHp: 400, baseLoot: 500, rarity: "common", color: "bg-emerald-400" },
+  { name: "Bank", emoji: "🏦", baseHp: 800, baseLoot: 1000, rarity: "rare", color: "bg-purple-500" },
+  { name: "Jeweler", emoji: "💎", baseHp: 1200, baseLoot: 1600, rarity: "rare", color: "bg-pink-500" },
+  { name: "Robot", emoji: "🤖", baseHp: 1500, baseLoot: 2000, rarity: "rare", color: "bg-cyan-500" },
 ];
 
 const TIER_4_TARGETS = [
-  { name: "The White House", emoji: "🏛️", baseHp: 3000, baseLoot: 2500, rarity: "common", color: "bg-blue-500" },
-  { name: "Mega Robot", emoji: "🦾", baseHp: 6000, baseLoot: 5000, rarity: "medium", color: "bg-slate-500" },
-  { name: "Superhero", emoji: "🦸", baseHp: 10000, baseLoot: 9000, rarity: "rare", color: "bg-red-500" },
-  { name: "Dragon", emoji: "🐉", baseHp: 20000, baseLoot: 18000, rarity: "ultra_rare", color: "bg-violet-600" },
+  { name: "The White House", emoji: "🏛️", baseHp: 3000, baseLoot: 3500, rarity: "common", color: "bg-blue-500" },
+  { name: "Mega Robot", emoji: "🦾", baseHp: 6000, baseLoot: 7000, rarity: "medium", color: "bg-slate-500" },
+  { name: "Superhero", emoji: "🦸", baseHp: 10000, baseLoot: 12000, rarity: "rare", color: "bg-red-500" },
+  { name: "Dragon", emoji: "🐉", baseHp: 20000, baseLoot: 25000, rarity: "ultra_rare", color: "bg-violet-600" },
 ];
 
 const ALL_TIERS = [TIER_1_TARGETS, TIER_2_TARGETS, TIER_3_TARGETS, TIER_4_TARGETS];
 
 // EQUIPMENT (Click Damage)
+// REBALANCED: Cheaper entry costs for faster early game
 const EQUIPMENT = [
   { 
     id: 'brass_knuckles', 
     name: "Brass Knuckles", 
     emoji: "✊", 
     clickDamage: 1, 
-    baseCost: 50, 
+    baseCost: 25, 
     description: "Basic street fight",
     color: "bg-amber-600"
   },
@@ -64,7 +66,7 @@ const EQUIPMENT = [
     name: "Crowbar", 
     emoji: "🪛", 
     clickDamage: 5, 
-    baseCost: 250, 
+    baseCost: 150, 
     description: "Break and enter",
     color: "bg-gray-600"
   },
@@ -73,7 +75,7 @@ const EQUIPMENT = [
     name: "Baseball Bat", 
     emoji: "⚾", 
     clickDamage: 12, 
-    baseCost: 1000, 
+    baseCost: 600, 
     description: "Swing for the fences",
     color: "bg-brown-600"
   },
@@ -82,7 +84,7 @@ const EQUIPMENT = [
     name: "Pistol", 
     emoji: "🔫", 
     clickDamage: 40, 
-    baseCost: 5000, 
+    baseCost: 3000, 
     description: "Pack some heat",
     color: "bg-slate-700"
   },
@@ -91,20 +93,21 @@ const EQUIPMENT = [
     name: "Assault Rifle", 
     emoji: "🔫", 
     clickDamage: 150, 
-    baseCost: 25000, 
+    baseCost: 15000, 
     description: "Heavy firepower",
     color: "bg-red-700"
   },
 ];
 
 // HENCHMEN (Auto-DPS) - Villain themed
+// REBALANCED: Lower first henchman to $15 for easier start
 const HENCHMEN = [
   { 
     id: 'street_rat', 
     name: "Street Rat", 
     emoji: "🐀", 
     baseDps: 1, 
-    baseCost: 25, 
+    baseCost: 15, 
     description: "Sneaky petty thief",
     color: "bg-gray-500"
   },
@@ -113,7 +116,7 @@ const HENCHMEN = [
     name: "Thug", 
     emoji: "👊", 
     baseDps: 4, 
-    baseCost: 100, 
+    baseCost: 80, 
     description: "Muscle for hire",
     color: "bg-orange-500"
   },
@@ -122,7 +125,7 @@ const HENCHMEN = [
     name: "Pro Burglar", 
     emoji: "🥷", 
     baseDps: 12, 
-    baseCost: 400, 
+    baseCost: 300, 
     description: "Silent and deadly",
     color: "bg-indigo-500"
   },
@@ -131,7 +134,7 @@ const HENCHMEN = [
     name: "Elite Hacker", 
     emoji: "💻", 
     baseDps: 35, 
-    baseCost: 1500, 
+    baseCost: 1200, 
     description: "Cracks any system",
     color: "bg-cyan-500"
   },
@@ -140,7 +143,7 @@ const HENCHMEN = [
     name: "Corrupt Lawyer", 
     emoji: "⚖️", 
     baseDps: 100, 
-    baseCost: 5000, 
+    baseCost: 4000, 
     description: "Gets you off the hook",
     color: "bg-blue-600"
   },
@@ -149,7 +152,7 @@ const HENCHMEN = [
     name: "Enforcer", 
     emoji: "🔨", 
     baseDps: 300, 
-    baseCost: 18000, 
+    baseCost: 15000, 
     description: "Collects debts",
     color: "bg-red-600"
   },
@@ -158,7 +161,7 @@ const HENCHMEN = [
     name: "Mad Scientist", 
     emoji: "🧪", 
     baseDps: 1000, 
-    baseCost: 75000, 
+    baseCost: 60000, 
     description: "Invents evil gadgets",
     color: "bg-purple-600"
   },
@@ -167,7 +170,7 @@ const HENCHMEN = [
     name: "Private Army", 
     emoji: "🪖", 
     baseDps: 4000, 
-    baseCost: 350000, 
+    baseCost: 280000, 
     description: "Military might",
     color: "bg-emerald-600"
   },
@@ -190,13 +193,16 @@ const getItemCost = (baseCost, owned) => {
 };
 
 // SPAWN LOGIC: Pick target from current tier with leakage mechanic
+// REBALANCED: Much lower thresholds for faster tier progression
 const spawnTarget = (currentTier, totalEarned) => {
   // Determine tier based on total earned
+  // New thresholds: $300 (Tier 2), $3000 (Tier 3), $30000 (Tier 4)
+  // Players should reach Tier 2 within 5-10 minutes
   let tierIndex = 0;
-  if (totalEarned >= 200000) tierIndex = 3; // Tier 4
-  else if (totalEarned >= 10000) tierIndex = 2; // Tier 3
-  else if (totalEarned >= 500) tierIndex = 1; // Tier 2
-  else tierIndex = 0; // Tier 1
+  if (totalEarned >= 30000) tierIndex = 3; // Tier 4: Unstoppable
+  else if (totalEarned >= 3000) tierIndex = 2; // Tier 3: Organized Crime
+  else if (totalEarned >= 300) tierIndex = 1; // Tier 2: Small Crimes
+  else tierIndex = 0; // Tier 1: The Streets
 
   // Leakage mechanic: 25% chance to spawn from lower tier (if not in tier 1)
   if (tierIndex > 0 && Math.random() < 0.25) {
@@ -314,26 +320,32 @@ export default function App() {
   }, [targetHp]);
 
   const defeatTarget = useCallback(() => {
-    const loot = Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.5));
+    // REBALANCED: Reduced loot scaling for smoother progression
+    const loot = Math.floor(currentTarget.baseLoot * (1 + (targetLevel - 1) * 0.3));
     
     setMoney(prev => prev + loot);
-    setTotalEarned(prev => prev + loot);
+    setTotalEarned(prev => {
+      const newTotal = prev + loot;
+      
+      // Spawn next target using tier system with updated totalEarned
+      const nextLevel = targetLevel + 1;
+      setTargetLevel(nextLevel);
+      
+      const { target, tierIndex } = spawnTarget(currentTier, newTotal);
+      setCurrentTarget(target);
+      setCurrentTier(tierIndex);
+      
+      // REBALANCED: Reduced HP scaling (0.2 instead of 0.3) for easier progression
+      const levelMultiplier = 1 + (nextLevel - 1) * 0.2;
+      const newMaxHp = Math.floor(target.baseHp * levelMultiplier);
+      
+      setTargetMaxHp(newMaxHp);
+      setTargetHp(newMaxHp);
+      
+      return newTotal;
+    });
     setTargetsDefeated(prev => prev + 1);
-    
-    // Spawn next target using tier system
-    const nextLevel = targetLevel + 1;
-    setTargetLevel(nextLevel);
-    
-    const { target, tierIndex } = spawnTarget(currentTier, totalEarned + loot);
-    setCurrentTarget(target);
-    setCurrentTier(tierIndex);
-    
-    const levelMultiplier = 1 + (nextLevel - 1) * 0.3;
-    const newMaxHp = Math.floor(target.baseHp * levelMultiplier);
-    
-    setTargetMaxHp(newMaxHp);
-    setTargetHp(newMaxHp);
-  }, [currentTarget, currentTier, targetLevel, totalEarned]);
+  }, [currentTarget, currentTier, targetLevel]);
 
   const handleClick = useCallback((e) => {
     // Deal damage
